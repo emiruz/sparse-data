@@ -1,5 +1,6 @@
 (ns sparse-data.core-test
   (:require [clojure.test :refer :all]
+            [clojure.java.io :as io]
             [sparse-data.core :as sp]))
 
 (def cmp-in [{ :a 1 :b 2 :c "four" }
