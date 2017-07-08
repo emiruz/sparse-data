@@ -1,0 +1,10 @@
+- [ ] Write the tests to prove the basic functions. Consider edge
+  cases.
+
+- [ ] Write package docs, fix license, write a description and how to
+  use. 
+
+- [ ] Upload it to Leiningrad.
+
+- [ ] Tell Starcount about it.
+
