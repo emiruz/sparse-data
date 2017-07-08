@@ -60,7 +60,7 @@ lazy. Note also that the spec *does* live in memory.
 
 ```clojure
 (def spec (make-spec your-coll))
-
+```
 
 A *save-spec* and *read-spec* function are provided for efficient saving and retrieval of
 specs to/from disk.
