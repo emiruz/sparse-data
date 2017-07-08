@@ -1,6 +1,7 @@
 (ns sparse-data.core
   (:require [clojure.string :as str]
             [clojure.set :as cset]
+            [clojure.core.reducers :as red]
             [clojure.java.io :as io]))
 
 (defn- flatten-map [m]
@@ -16,8 +17,8 @@
 
 (defn make-spec[coll]
   "Create a new column spec from a collection"
-  (into []
-  (reduce #(distinct (doall(concat %1 (flatten-map %2)))) [] coll)))
+  (defn f ([x y] (distinct (doall(concat x (flatten-map y))))) ([][]))
+  (red/fold f coll))
 
 (defn save-spec[spec fname]
   "Saves a column spec to a file"
