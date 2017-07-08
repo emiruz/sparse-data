@@ -36,7 +36,7 @@ happily deals with nesting to any level and any type of values. For example,
 the port field may have valid values "mobile", "desktop", "tablet" and so the column spec
 would contain:
 
-   ... [:port mobile] [:port desktop] [:port table] ...
+    ... [:port mobile] [:port desktop] [:port table] ...
 
 Each item in the column spec has an index which it's just it's position in the list. Now,
 for each new piece of data, instead of storing the entire record, all we need to store are
