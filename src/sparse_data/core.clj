@@ -1,5 +1,6 @@
 (ns sparse-data.core
   (:require [clojure.string :as str]
+            [clojure.set :as cset]
             [clojure.java.io :as io]))
 
 (defn- flatten-map [m]
@@ -15,7 +16,8 @@
 
 (defn make-spec[coll]
   "Create a new column spec from a collection"
-  (reduce #(distinct (concat %1 (flatten-map %2))) [] coll))
+  (into []
+  (reduce #(distinct (concat %1 (flatten-map %2))) [] coll)))
 
 (defn save-spec[spec fname]
   "Saves a column spec to a file"
@@ -52,7 +54,7 @@
                 (cons
                  (get-map-from-vec
                   spec
-                  (into [] (clojure.set/intersection
+                  (into [] (cset/intersection
                             (into #{} cols)
                             (into #{} (map #(Long. %) (str/split line #"\t"))))))
                  (helper rdr))
