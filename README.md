@@ -70,14 +70,14 @@ a gzip compressed file.
 
 ```clojure
 (make-sparse your-coll spec "some-file.gz")
-
+```
 
 5. Use your archive by selecting the desired fields. The select function will return a lazy
 sequence of maps.
 
 ```clojure
 (select spec "some-file.gz" [[:some-prop][:some-other-prop][:prop :sub-prop]])
-
+```
 
 6. Use your lazy sequence to calculate, create datasets (e.g. Incanter's to-dataset function), etc.
 
