@@ -50,13 +50,15 @@ the indexes from our column spec of the values we encounter.
 
 2. Either *use* or *require* the library in your code:
 
-    (use 'sparse-data)
+```clojure
+(use 'sparse-data)
 
 3. You may want to start by creating a column spec directly from your data. Note that the
 function accepts a sequence, so your data can be extremely large since the sequence can be
 lazy. Note also that the spec *does* live in memory.
 
-    (def spec (make-spec your-coll))
+```clojure
+(def spec (make-spec your-coll))
 
 A *save-spec* and *read-spec* function are provided for efficient saving and retrieval of
 specs to/from disk.
@@ -64,12 +66,14 @@ specs to/from disk.
 4. Create your archive file. This function uses your spec and efficiently encodes your data to
 a gzip compressed file.
 
-    (make-sparse your-coll spec "some-file.gz")
+```clojure
+(make-sparse your-coll spec "some-file.gz")
 
 5. Use your archive by selecting the desired fields. The select function will return a lazy
 sequence of maps.
 
-    (select spec "some-file.gz" [[:some-prop][:some-other-prop][:prop :sub-prop]])
+```clojure
+(select spec "some-file.gz" [[:some-prop][:some-other-prop][:prop :sub-prop]])
 
 6. Use your lazy sequence to calculate, create datasets (e.g. Incanter's to-dataset function), etc.
 
