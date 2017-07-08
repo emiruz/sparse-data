@@ -17,8 +17,8 @@
 
 (defn make-spec[coll]
   "Create a new column spec from a collection"
-  (defn f ([x y] (distinct (doall(concat x (flatten-map y))))) ([][]))
-  (red/fold f coll))
+  (defn f ([x y] (doall(distinct (concat x (flatten-map y))))) ([][]))
+  (into [] (red/fold f coll)))
 
 (defn save-spec[spec fname]
   "Saves a column spec to a file"
