@@ -42,7 +42,9 @@ would contain:
 
 Each item in the column spec has an index which it's just it's position in the list. Now,
 for each new piece of data, instead of storing the entire record, all we need to store are
-the indexes from our column spec of the values we encounter.
+the indexes of the values we encounter. This list is kept in a TSV GZIP and is henceforth
+your data archive, from which you may create a lazy sequence of any subset of fields to be
+used in further processing.
 
 ## Getting Started
 
@@ -56,30 +58,29 @@ the indexes from our column spec of the values we encounter.
 (use 'sparse-data)
 ```
 
-3. You may want to start by creating a column spec directly from your data. Note that the
-function accepts a sequence, so your data can be extremely large since the sequence can be
-lazy. Note also that the spec *does* live in memory.
+3. You may want to start by creating a column spec directly from your data. The function
+expects you to supply a sequence of maps. If your sequence is lazy your data may be
+extremely large. Note that unlike the data the spec *does* live in memory.
 
 ```clojure
 (def spec (make-spec your-coll))
 ```
 
-A *save-spec* and *read-spec* function are provided for efficient saving and retrieval of
+*save-spec* and *read-spec* functions are provided for efficient saving and retrieval of
 specs to/from disk.
 
 4. Create your archive file. This function uses your spec and efficiently encodes your data to
-a gzip compressed file.
+a gzip compressed file TSV index file.
 
 ```clojure
 (make-sparse your-coll spec "some-file.gz")
 ```
 
-5. Use your archive by selecting the desired fields. The select function will return a lazy
-sequence of maps.
+5. Select information from your archive. The select function will return a lazy sequence of
+maps according to the fields which you have specified.
 
 ```clojure
 (select spec "some-file.gz" [[:some-prop][:some-other-prop][:prop :sub-prop]])
 ```
 
 6. Use your lazy sequence to calculate, create datasets (e.g. Incanter's to-dataset function), etc.
-
