@@ -4,6 +4,8 @@
 
 A library for efficiently storing and querying categorical sparse data.
 
+The library is a work in progress. Please raise issues and contribute if you'd like.
+
 ## Rationale
 
 Frequently we are presented with a situation in which we have a large amount
