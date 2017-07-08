@@ -52,7 +52,7 @@ the indexes from our column spec of the values we encounter.
 
 ```clojure
 (use 'sparse-data)
-
+```
 
 3. You may want to start by creating a column spec directly from your data. Note that the
 function accepts a sequence, so your data can be extremely large since the sequence can be
