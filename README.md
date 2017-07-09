@@ -28,8 +28,8 @@ Now, say our sites are popular and the data collected spans giga-bytes a day,
 we're quickly in the position where we are not able to hold all the data we
 need on a PC.
 
-Enter the sparse-data library. It aims to store categorical sparse data on disk some N
-times less space than gzipped JSON, and to make this data easy to query from Clojure.
+Enter the sparse-data library. It aims to store categorical sparse data on disk in some N
+times less space than gzipped JSON. It also aims to make your data easy to query from Clojure.
 
 The central enabling concept is the "column spec". The column spec is a map containing
 all the values of all fields as keys, and an index as the value. The column spec happily deals
@@ -39,9 +39,10 @@ values "mobile", "desktop", "tablet" and so the column spec would contain:
     ..., [:port "mobile"] 4, [:port "desktop"] 5, [:port "tablet"] 6, ...
 
 For each new piece of data, instead of storing the entire record, all we need to store are
-the indexes of the values we encounter. This list is kept in a TSV GZIP, from which you may
-create a lazy sequence of any subset of fields using the *select* function to be used in
-further processing.
+the indexes of the values we encounter. Default values (nil) are not stored. This list is
+kept in a TSV GZIP, from which you may create a lazy sequence of any subset of fields using
+the *select* function to be used in further processing.
+
 
 ## Getting Started
 
@@ -87,8 +88,8 @@ maps according to the fields which you have specified.
 
 A JSON file containing 5.1M objects was used. It was 1.6GB on disk and 192MB GZIP compressed.
 It contained 8 fields, most of which were compulsory, and 134945 possible values. *make-spec* was used to create
-a spec file (3.5MB on disk), and *make-sparse* was used to store the data, resulting in a 46MB archive file
-(213MB uncompressed). That's roughly **4 times smaller** on disk than the compressed JSON.
+a spec file (3.5MB on disk), and *make-sparse* was used to store the data, resulting in a 42MB archive file.
+That's roughly **4 times smaller** on disk than the compressed JSON.
 
 I think that sits somewhere around the likely worse case scenario. Generally, the more possible values and the
 sparser (more optional) they are, the more efficient the algorithm in comparison to GZIP JSON.

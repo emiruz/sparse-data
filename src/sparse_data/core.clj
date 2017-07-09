@@ -41,7 +41,8 @@
     (doseq [j coll]
       (io/copy
        (str
-        (str/join "\t" (filter some? (map #(get spec %) (flatten-map j))))
+        (str/join "\t" (map #(Long/toString % 36)
+                            (filter some? (map #(get spec %) (flatten-map j)))))
         "\n") w))))
 
 (defn- get-map-from-vec [spec cols]
@@ -63,7 +64,8 @@
                   spec
                   (into [] (cset/intersection
                             cols
-                            (into #{} (map #(Long. %) (str/split line #"\t"))))))
+                            (into #{} (map #(Long/parseLong % 36) (str/split line #"\t"))))))
                  (helper rdr))
                 (do (.close rdr) nil))))]
     (helper (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader))))
+
