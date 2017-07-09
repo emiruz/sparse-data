@@ -12,6 +12,12 @@
               [:b 3] 4, [:d ["five" "six"]] 5,
               [:d :f "seven"] 6, [:d :g 8] 7})
 
+
+(def cmp-out {[:a 1] 0, [:b 2] 1,
+              [:c "four"] 2, [:a 2] 3,
+              [:b 3] 4, [:d ["five" "six"]] 5,
+              [:d :f "seven"] 6, [:d :g 8] 7})
+
 (deftest make-spec-complex
   (testing "Checking make-spec with a compound input"
     (is (= (sp/make-spec cmp-in) cmp-out))))

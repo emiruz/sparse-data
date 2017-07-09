@@ -18,9 +18,12 @@
   "Create a new column spec from a collection"
   (defn f [x y]
     (let [o (flatten-map y)]
-      (doall(merge x (reduce #(merge %1 (hash-map %2 false)) {} o)))))
+      (reduce #(update-in %1 [%2] (constantly false)) x o)))
   (let [o (reduce f {} coll)]
-    (doall (zipmap (keys o) (range 0 (count o))))))
+    (doall
+     (zipmap
+      (filter #(some? (last %))(keys o))
+      (range 0 (count o))))))
 
 (defn save-spec[spec fname]
   "Saves a column spec to a file"

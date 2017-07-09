@@ -82,3 +82,13 @@ maps according to the fields which you have specified.
 ```
 
 6. Use your lazy sequence to calculate, create datasets (e.g. Incanter's to-dataset function), etc.
+
+# Performance Example
+
+A JSON file containing 5.1M objects was used. It was 1.6GB on disk and 192MB GZIP compressed.
+It contained 8 fields, most of which were compulsory, and 134945 possible values. *make-spec* was used to create
+a spec file (3.5MB on disk), and *make-sparse* was used to store the data, resulting in a 46MB archive file
+(213MB uncompressed). That's roughly **4 times smaller** on disk than the compressed JSON.
+
+I think that sits somewhere around the likely worse case scenario. Generally, the more possible values and the
+sparser (more optional) they are, the more efficient the algorithm in comparison to GZIP JSON.
