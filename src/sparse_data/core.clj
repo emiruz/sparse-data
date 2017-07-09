@@ -45,27 +45,25 @@
                             (filter some? (map #(get spec %) (flatten-map j)))))
         "\n") w))))
 
-(defn- get-map-from-vec [spec cols]
-  (apply merge
-         (map
-          #(let [o (nth (keys spec) %)](assoc-in {} (butlast o) (last o)))
-          cols)))
-
 (defn select [spec fname fields]
   "select a lazy seq of values from a sparse data file according to the fields specified."
-  (def cols (into #{} (filter some? (map
-             (fn[x] (if (some #(= (butlast x) %) fields) (get spec x)))
-             (keys spec)))))
-  (letfn [(helper [rdr]
-            (lazy-seq
-              (if-let [line (.readLine rdr)]
-                (cons
-                 (get-map-from-vec
-                  spec
-                  (into [] (cset/intersection
-                            cols
-                            (into #{} (map #(Long/parseLong % 36) (str/split line #"\t"))))))
+  (def m
+    (if (= fields :all)
+      spec
+      (filter some? (map (fn[x] (if (some #(= (butlast (first x)) %) fields) x)) spec))))
+  (def cols (into {} (map (fn[x][(last x) (first x)]) m)))
+  (letfn
+      [(helper [rdr]
+         (lazy-seq
+          (if-let [line (.readLine rdr)]
+            (cons
+             (into
+              {}
+              (keys
+               (select-keys
+                spec
+                (vals
+                 (select-keys cols (map #(Long/parseLong % 36) (str/split line #"\t")))))))
                  (helper rdr))
                 (do (.close rdr) nil))))]
     (helper (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader))))
-
