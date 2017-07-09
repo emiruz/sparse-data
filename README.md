@@ -12,7 +12,7 @@ Frequently we are presented with a situation in which we have a large amount
 of data which is both sparse and which can be treated categorically.
 
 For example, one might collect event data from a web-sites detailing which page
-was visited, when, how long was spent on the page, which browser was used, on
+was visited, and when, how long was spent on the page, which browser was used, on
 which device, from which country, etc. The pertinent part of the data may look
 something like this.
 
@@ -28,23 +28,20 @@ Now, say our sites are popular and the data collected spans giga-bytes a day,
 we're quickly in the position where we are not able to hold all the data we
 need on a PC.
 
-Enter the sparse-data library. It holds categorical sparse data in format orders
-of magnitude more efficient than raw text and so makes it possible to store and query
-vasts amount of data on your PC.
+Enter the sparse-data library. It aims to store categorical sparse data on disk some N
+times less space than gzipped JSON, and to make this data easy to query from Clojure.
 
-The central enabling concept is the "column spec". The column spec is a list containing
-all the permutations of fields and field values that the data may contain. The column spec
-happily deals with nesting to any level and any type of values. For example,
-the port field may have valid values "mobile", "desktop", "tablet" and so the column spec
-would contain:
+The central enabling concept is the "column spec". The column spec is a map containing
+all the values of all fields as keys, and an index as the value. The column spec happily deals
+with nesting to any level and any type of values. For example, the port field may have valid
+values "mobile", "desktop", "tablet" and so the column spec would contain:
 
-    ... [:port mobile] [:port desktop] [:port table] ...
+    ..., [:port "mobile"] 4, [:port "desktop"] 5, [:port "tablet"] 6, ...
 
-Each item in the column spec has an index which it's just it's position in the list. Now,
-for each new piece of data, instead of storing the entire record, all we need to store are
-the indexes of the values we encounter. This list is kept in a TSV GZIP and is henceforth
-your data archive, from which you may create a lazy sequence of any subset of fields to be
-used in further processing.
+For each new piece of data, instead of storing the entire record, all we need to store are
+the indexes of the values we encounter. This list is kept in a TSV GZIP, from which you may
+create a lazy sequence of any subset of fields using the *select* function to be used in
+further processing.
 
 ## Getting Started
 
@@ -60,7 +57,8 @@ used in further processing.
 
 3. You may want to start by creating a column spec directly from your data. The function
 expects you to supply a sequence of maps. If your sequence is lazy your data may be
-extremely large. Note that unlike the data the spec *does* live in memory.
+extremely large. Note that unlike the data itself which is stored on disk,  the spec *does*
+need to be able to fit into memory.
 
 ```clojure
 (def spec (make-spec your-coll))
