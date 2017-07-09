@@ -1,7 +1,6 @@
 (ns sparse-data.core
   (:require [clojure.string :as str]
             [clojure.set :as cset]
-            [clojure.core.reducers :as red]
             [clojure.java.io :as io]))
 
 (defn- flatten-map [m]
@@ -17,8 +16,11 @@
 
 (defn make-spec[coll]
   "Create a new column spec from a collection"
-  (defn f ([x y] (doall(distinct (concat x (flatten-map y))))) ([][]))
-  (into [] (red/fold f coll)))
+  (defn f [x y]
+    (let [o (flatten-map y)]
+      (doall(merge x (reduce #(merge %1 (hash-map %2 false)) {} o)))))
+  (let [o (reduce f {} coll)]
+    (doall (zipmap (keys o) (range 0 (count o))))))
 
 (defn save-spec[spec fname]
   "Saves a column spec to a file"
@@ -36,28 +38,29 @@
     (doseq [j coll]
       (io/copy
        (str
-        (str/join "\t" (keep-indexed #(if (= (get-in j (butlast %2)) (last %2)) %1) spec))
+        (str/join "\t" (filter some? (map #(get spec %) (flatten-map j))))
         "\n") w))))
 
 (defn- get-map-from-vec [spec cols]
-  (apply
-   merge
-   (map #(let [o (nth spec %)](assoc-in {} (butlast o) (last o))) cols)))
+  (apply merge
+         (map
+          #(let [o (nth (keys spec) %)](assoc-in {} (butlast o) (last o)))
+          cols)))
 
 (defn select [spec fname fields]
   "select a lazy seq of values from a sparse data file according to the fields specified."
-  (def cols (keep-indexed (fn[i x] (if (some #(= (butlast x) %) fields) i)) spec))
+  (def cols (into #{} (filter some? (map
+             (fn[x] (if (some #(= (butlast x) %) fields) (get spec x)))
+             (keys spec)))))
   (letfn [(helper [rdr]
             (lazy-seq
-             (filter
-              some?
               (if-let [line (.readLine rdr)]
                 (cons
                  (get-map-from-vec
                   spec
                   (into [] (cset/intersection
-                            (into #{} cols)
+                            cols
                             (into #{} (map #(Long. %) (str/split line #"\t"))))))
                  (helper rdr))
-                (do (.close rdr) nil)))))]
+                (do (.close rdr) nil))))]
     (helper (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader))))

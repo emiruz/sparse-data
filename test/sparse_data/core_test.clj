@@ -1,6 +1,5 @@
 (ns sparse-data.core-test
   (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]
             [sparse-data.core :as sp]))
 
 (def cmp-in [{ :a 1 :b 2 :c "four" }
@@ -8,9 +7,10 @@
              { :c "four" :d [ "five" "six" ] }
              { :d { :f "seven" :g 8 }}])
 
-(def cmp-out [[:a 1] [:b 2] [:c "four"]
-              [:a 2] [:b 3] [:d ["five" "six"]]
-              [:d :f "seven"] [:d :g 8]])
+(def cmp-out {[:a 1] 0, [:b 2] 1,
+              [:c "four"] 2, [:a 2] 3,
+              [:b 3] 4, [:d ["five" "six"]] 5,
+              [:d :f "seven"] 6, [:d :g 8] 7})
 
 (deftest make-spec-complex
   (testing "Checking make-spec with a compound input"
@@ -29,9 +29,9 @@
     (def fname "sparse-tests.data.tmp.gz")
     (let [in (flatten (repeat 1 cmp-in))]
       (sp/make-sparse in cmp-out fname)
-      (is (= (count (sp/select cmp-out fname [[:a]])) 2))
-      (is (= (count (sp/select cmp-out fname [[:a] [:c]])) 3))
-      (is (= (count (sp/select cmp-out fname [[:d :g]])) 1))
-      (is (= (count (sp/select cmp-out fname [[:d :f]])) 1))
-      (is (= (count (sp/select cmp-out fname [[:d]])) 1))
+      (is (= (count (filter some? (sp/select cmp-out fname [[:a]]))) 2))
+      (is (= (count (filter some? (sp/select cmp-out fname [[:a] [:c]]))) 3))
+      (is (= (count (filter some? (sp/select cmp-out fname [[:d :g]]))) 1))
+      (is (= (count (filter some? (sp/select cmp-out fname [[:d :f]]))) 1))
+      (is (= (count (filter some? (sp/select cmp-out fname [[:d]]))) 1))
       (clojure.java.io/delete-file fname :silently))))
