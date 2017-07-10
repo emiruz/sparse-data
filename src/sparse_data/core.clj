@@ -61,10 +61,8 @@
                 {}
                 (map
                  (fn[x][(pop x) (peek x)])
-                 ((comp keys
-                       #(select-keys spec %)
-                       vals
-                       #(select-keys cols %))                  
+                 ((comp vals
+                       #(select-keys cols %))
                        (map #(Long/parseLong % 36) (str/split line #"\t")))))
                (helper rdr))
               (do (.close rdr) nil))))]
