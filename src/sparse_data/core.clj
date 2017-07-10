@@ -59,15 +59,12 @@
               (cons
                (into
                 {}
-                (map
-                 (fn[x][(pop x) (peek x)])                       
-                 (keys
-                  (select-keys
+                (map (fn[x][(pop x) (peek x)])
+                 ((comp keys select-keys)
                    spec
-                   (vals
-                    (select-keys
+                   ((comp vals select-keys)
                      cols
-                     (map #(Long/parseLong % 36) (str/split line #"\t"))))))))
+                     (map #(Long/parseLong % 36) (str/split line #"\t"))))))
                (helper rdr))
               (do (.close rdr) nil))))]
       (helper (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader)))))
