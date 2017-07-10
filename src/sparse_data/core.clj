@@ -22,7 +22,7 @@
         o (reduce f {} coll)]
     (doall
      (zipmap
-      (filter #(some? (last %))(keys o))
+      (filter #(some? (peek %))(keys o))
       (range 0 (count o))))))
 
 (defn save-spec[spec fname]
@@ -50,8 +50,8 @@
   (let
       [m (if (= fields :all)
            spec
-           (filter some? (map (fn[x] (if (some #(= (butlast (first x)) %) fields) x)) spec)))
-       cols (into {} (map (fn[x][(last x) (first x)]) m))]
+           (filter some? (map (fn[x] (if (some #(= (pop (first x)) %) fields) x)) spec)))
+       cols (into {} (map (fn[x][(peek x) (first x)]) m))]
     (letfn
         [(helper [rdr]
            (lazy-seq
@@ -59,11 +59,15 @@
               (cons
                (into
                 {}
-                (keys
-                 (select-keys
-                  spec
-                  (vals
-                   (select-keys cols (map #(Long/parseLong % 36) (str/split line #"\t")))))))
+                (map
+                 (fn[x][(pop x) (peek x)])                       
+                 (keys
+                  (select-keys
+                   spec
+                   (vals
+                    (select-keys
+                     cols
+                     (map #(Long/parseLong % 36) (str/split line #"\t"))))))))
                (helper rdr))
               (do (.close rdr) nil))))]
       (helper (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader)))))
