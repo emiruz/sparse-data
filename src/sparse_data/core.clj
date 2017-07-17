@@ -14,8 +14,9 @@
                    [[k v]])))
              m)) []))
 
-(defn make-spec[coll]
+(defn make-spec
   "Create a new column spec from a collection"
+  [coll]
   (let [f (fn [x y]
             (let [o (flatten-map y)]
               (reduce #(update-in %1 [%2] (constantly false)) x o)))
@@ -25,18 +26,21 @@
       (filter #(some? (peek %))(keys o))
       (range 0 (count o))))))
 
-(defn save-spec[spec fname]
+(defn save-spec
   "Saves a column spec to a file"
+  [spec fname]
   (with-open [w (-> fname io/output-stream java.util.zip.GZIPOutputStream.)]  
     (io/copy (pr-str spec) w)))
 
-(defn read-spec[fname]
+(defn read-spec
   "Reads a column spec from a file"
+  [fname]
   (with-open [r (-> fname io/input-stream java.util.zip.GZIPInputStream. io/reader)]
     (clojure.edn/read-string (slurp r))))
 
-(defn make-sparse[coll spec fname]
+(defn make-sparse
   "Write the supplied collection to a sparse data file according to the column spec provided."
+  [coll spec fname]
   (with-open [w (-> fname io/output-stream java.util.zip.GZIPOutputStream.)]
     (doseq [j coll]
       (io/copy
@@ -45,8 +49,9 @@
                             (filter some? (map #(get spec %) (flatten-map j)))))
         "\n") w))))
 
-(defn select [spec fname fields]
+(defn select
   "select a lazy seq of values from a sparse data file according to the fields specified."
+  [spec fname fields]
   (let
       [m (if (= fields :all)
            spec
